@@ -1,0 +1,9 @@
+{
+  "appId": "com.adzkia.catatan",
+  "appName": "Catatan",
+  "webDir": "www",
+  "server": {
+    "url": "https://akortremak.github.io/catatan/",
+    "cleartext": true
+  }
+}
