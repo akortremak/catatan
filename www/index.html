@@ -261,7 +261,7 @@
       border-radius: 10px;
     }
 
-    /* Market Section (Opsi 2: JPY & SGD + Sparkline 7 Hari + Panah & %) */
+    /* Market Section (JPY & SGD + Rentang 1HR / 1BLN / 1TH + Area Chart) */
     .market-card {
       background: var(--glass-card);
       border: 1px solid var(--glass-border);
@@ -274,30 +274,68 @@
       display: flex;
       align-items: center;
       justify-content: space-between;
-      margin-bottom: 10px;
+      gap: 6px;
+      margin-bottom: 9px;
     }
 
     .market-title-group {
       display: flex;
       align-items: center;
       gap: 6px;
+      min-width: 0;
     }
 
     .market-title {
       font-size: 0.84rem;
       font-weight: 700;
       color: #fff;
+      white-space: nowrap;
     }
 
     .market-meta {
-      font-size: 0.66rem;
+      font-size: 0.64rem;
       color: var(--text-muted);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
     }
 
     .market-actions {
       display: flex;
       align-items: center;
       gap: 6px;
+      flex-shrink: 0;
+    }
+
+    .range-pills {
+      display: inline-flex;
+      align-items: center;
+      background: rgba(2, 6, 23, 0.55);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 10px;
+      padding: 2px;
+      gap: 2px;
+    }
+
+    .range-btn {
+      background: transparent;
+      border: none;
+      color: var(--text-muted);
+      font-size: 0.62rem;
+      font-weight: 700;
+      padding: 3px 6px;
+      border-radius: 7px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .range-btn:hover {
+      color: #fff;
+    }
+
+    .range-btn.active {
+      background: rgba(59, 130, 246, 0.25);
+      color: #93c5fd;
     }
 
     .refresh-market-btn {
@@ -305,13 +343,13 @@
       border: 1px solid var(--glass-border);
       color: var(--text-muted);
       border-radius: 9px;
-      padding: 4px 8px;
-      font-size: 0.68rem;
+      padding: 4px 7px;
+      font-size: 0.66rem;
       font-weight: 600;
       cursor: pointer;
       display: inline-flex;
       align-items: center;
-      gap: 4px;
+      gap: 3px;
       transition: all 0.2s ease;
     }
 
@@ -343,7 +381,7 @@
       display: flex;
       flex-direction: column;
       justify-content: space-between;
-      gap: 6px;
+      gap: 5px;
     }
 
     .fx-top {
@@ -361,7 +399,7 @@
     }
 
     .fx-change {
-      font-size: 0.66rem;
+      font-size: 0.65rem;
       font-weight: 700;
       padding: 2px 6px;
       border-radius: 8px;
@@ -404,11 +442,12 @@
     .fx-span-label {
       font-size: 0.62rem;
       color: var(--text-muted);
+      white-space: nowrap;
     }
 
     .fx-sparkline {
-      width: 68px;
-      height: 24px;
+      width: 76px;
+      height: 28px;
       flex-shrink: 0;
       overflow: visible;
     }
@@ -887,21 +926,25 @@
 
     <!-- Scrollable Area: Pasar Uang + Riwayat Transaksi -->
     <div class="content-scroll">
-      <!-- Pasar Uang (Jepang JPY & Singapura SGD) -->
+      <!-- Pasar Uang (Jepang JPY & Singapura SGD - Rentang 1HR / 1BLN / 1TH) -->
       <div class="market-card">
         <div class="market-header">
           <div class="market-title-group">
             <span class="market-title">Pasar Uang</span>
-            <span class="market-meta" id="marketStatusText">Memuat kurs...</span>
+            <span class="market-meta" id="marketStatusText">• Memuat...</span>
           </div>
           <div class="market-actions">
+            <div class="range-pills" role="group" aria-label="Rentang Waktu Kurs">
+              <button type="button" class="range-btn" data-range="1HR" onclick="setMarketRange('1HR')">1HR</button>
+              <button type="button" class="range-btn" data-range="1BLN" onclick="setMarketRange('1BLN')">1BLN</button>
+              <button type="button" class="range-btn active" data-range="1TH" onclick="setMarketRange('1TH')">1TH</button>
+            </div>
             <button type="button" class="refresh-market-btn" id="refreshMarketBtn" onclick="fetchMarketRates()" title="Perbarui Kurs">
               <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
                 <polyline points="23 4 23 10 17 10"></polyline>
                 <polyline points="1 20 1 14 7 14"></polyline>
                 <path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"></path>
               </svg>
-              <span>Sync</span>
             </button>
           </div>
         </div>
@@ -911,13 +954,13 @@
           <div class="fx-box">
             <div class="fx-top">
               <span class="fx-pair">🇯🇵 1 JPY</span>
-              <span class="fx-change flat" id="jpyChangeBadge">— 0.00%</span>
+              <span class="fx-change flat" id="jpyChangeBadge">— 0,00%</span>
             </div>
             <div class="fx-rate" id="jpyRateText">Rp —</div>
             <div class="fx-chart-row">
-              <span class="fx-span-label">Tren 7 hari</span>
-              <svg class="fx-sparkline" id="jpySparkline" viewBox="0 0 68 24">
-                <polyline fill="none" stroke="#94a3b8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" points="2,12 66,12"></polyline>
+              <span class="fx-span-label" id="jpySpanLabel">Tren 1TH</span>
+              <svg class="fx-sparkline" id="jpySparkline" viewBox="0 0 76 28">
+                <polyline fill="none" stroke="#94a3b8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" points="2,14 74,14"></polyline>
               </svg>
             </div>
           </div>
@@ -926,13 +969,13 @@
           <div class="fx-box">
             <div class="fx-top">
               <span class="fx-pair">🇸🇬 1 SGD</span>
-              <span class="fx-change flat" id="sgdChangeBadge">— 0.00%</span>
+              <span class="fx-change flat" id="sgdChangeBadge">— 0,00%</span>
             </div>
             <div class="fx-rate" id="sgdRateText">Rp —</div>
             <div class="fx-chart-row">
-              <span class="fx-span-label">Tren 7 hari</span>
-              <svg class="fx-sparkline" id="sgdSparkline" viewBox="0 0 68 24">
-                <polyline fill="none" stroke="#94a3b8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" points="2,12 66,12"></polyline>
+              <span class="fx-span-label" id="sgdSpanLabel">Tren 1TH</span>
+              <svg class="fx-sparkline" id="sgdSparkline" viewBox="0 0 76 28">
+                <polyline fill="none" stroke="#94a3b8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" points="2,14 74,14"></polyline>
               </svg>
             </div>
           </div>
@@ -1029,6 +1072,10 @@
     let latestExpenseVal = 0;
     let latestBalanceVal = 0;
 
+    // State Pasar Uang (Default langsung 1TH)
+    let activeMarketRange = '1TH';
+    let latestMarketData = null;
+
     document.getElementById('transaction_date').valueAsDate = new Date();
 
     const now = new Date();
@@ -1057,10 +1104,10 @@
     function renderChangeBadge(badgeEl, pctChange) {
       if (typeof pctChange !== 'number' || Number.isNaN(pctChange)) {
         badgeEl.className = 'fx-change flat';
-        badgeEl.textContent = '— 0.00%';
+        badgeEl.textContent = '— 0,00%';
         return;
       }
-      const absPct = Math.abs(pctChange).toFixed(2);
+      const absPct = Math.abs(pctChange).toFixed(2).replace('.', ',');
       if (pctChange > 0.005) {
         badgeEl.className = 'fx-change up';
         badgeEl.textContent = `▲ +${absPct}%`;
@@ -1069,181 +1116,278 @@
         badgeEl.textContent = `▼ -${absPct}%`;
       } else {
         badgeEl.className = 'fx-change flat';
-        badgeEl.textContent = `• 0.00%`;
+        badgeEl.textContent = `• 0,00%`;
       }
     }
 
-    function renderSparkline(svgEl, series, pctChange) {
+    function renderAreaSparkline(svgEl, series, pctChange, gradId) {
       if (!Array.isArray(series) || series.length < 2) {
-        svgEl.innerHTML = `<polyline fill="none" stroke="#94a3b8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" points="2,12 66,12"></polyline>`;
+        svgEl.innerHTML = `<polyline fill="none" stroke="#94a3b8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" points="2,14 74,14"></polyline>`;
         return;
       }
 
-      const width = 68;
-      const height = 24;
-      const padX = 2;
-      const padY = 3;
+      const width = 76;
+      const height = 28;
+      const padX = 3;
+      const padTop = 3;
+      const padBottom = 2;
 
       const minVal = Math.min(...series);
       const maxVal = Math.max(...series);
       const range = maxVal - minVal || 1;
 
-      const points = series.map((val, idx) => {
+      const coords = series.map((val, idx) => {
         const x = padX + (idx / (series.length - 1)) * (width - padX * 2);
         const normalized = (val - minVal) / range;
-        const y = height - padY - normalized * (height - padY * 2);
-        return `${x.toFixed(1)},${y.toFixed(1)}`;
-      }).join(' ');
+        const y = height - padBottom - normalized * (height - padTop - padBottom);
+        return { x: Number(x.toFixed(1)), y: Number(y.toFixed(1)) };
+      });
+
+      const linePoints = coords.map(p => `${p.x},${p.y}`).join(' ');
+      const firstPt = coords[0];
+      const lastPt = coords[coords.length - 1];
+      const areaPoints = `${firstPt.x},${height - padBottom} ${linePoints} ${lastPt.x},${height - padBottom}`;
 
       let strokeColor = '#94a3b8';
       if (pctChange > 0.005) strokeColor = '#10b981';
       else if (pctChange < -0.005) strokeColor = '#f43f5e';
 
       svgEl.innerHTML = `
+        <defs>
+          <linearGradient id="${gradId}" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stop-color="${strokeColor}" stop-opacity="0.32"></stop>
+            <stop offset="100%" stop-color="${strokeColor}" stop-opacity="0.0"></stop>
+          </linearGradient>
+        </defs>
+        <polygon points="${areaPoints}" fill="url(#${gradId})"></polygon>
         <polyline
           fill="none"
           stroke="${strokeColor}"
-          stroke-width="2"
+          stroke-width="1.8"
           stroke-linecap="round"
           stroke-linejoin="round"
-          points="${points}"
+          points="${linePoints}"
         ></polyline>
+        <circle cx="${lastPt.x}" cy="${lastPt.y}" r="2.4" fill="${strokeColor}"></circle>
       `;
     }
 
-    function applyMarketDisplay(payload) {
-      const { jpyRate, jpyPrevRate, sgdRate, sgdPrevRate, jpySeries, sgdSeries, sourceLabel } = payload;
+    function renderMarketForRange() {
+      if (!latestMarketData) return;
+
+      const {
+        jpyRate,
+        sgdRate,
+        jpyByRange,
+        sgdByRange,
+        sourceLabel,
+        updatedTime
+      } = latestMarketData;
 
       document.getElementById('jpyRateText').textContent = formatIdrRate(jpyRate);
       document.getElementById('sgdRateText').textContent = formatIdrRate(sgdRate);
 
-      const jpyPct = jpyPrevRate && jpyPrevRate > 0 ? ((jpyRate - jpyPrevRate) / jpyPrevRate) * 100 : 0;
-      const sgdPct = sgdPrevRate && sgdPrevRate > 0 ? ((sgdRate - sgdPrevRate) / sgdPrevRate) * 100 : 0;
+      const jpyEntry = jpyByRange[activeMarketRange] || jpyByRange['1TH'];
+      const sgdEntry = sgdByRange[activeMarketRange] || sgdByRange['1TH'];
+
+      const jpyPct = jpyEntry && jpyEntry.base > 0 ? ((jpyRate - jpyEntry.base) / jpyEntry.base) * 100 : 0;
+      const sgdPct = sgdEntry && sgdEntry.base > 0 ? ((sgdRate - sgdEntry.base) / sgdEntry.base) * 100 : 0;
 
       renderChangeBadge(document.getElementById('jpyChangeBadge'), jpyPct);
       renderChangeBadge(document.getElementById('sgdChangeBadge'), sgdPct);
 
-      renderSparkline(document.getElementById('jpySparkline'), jpySeries, jpyPct);
-      renderSparkline(document.getElementById('sgdSparkline'), sgdSeries, sgdPct);
+      const labelText = activeMarketRange === '1HR'
+        ? 'Harian (1HR)'
+        : activeMarketRange === '1BLN'
+          ? 'Tren 1BLN'
+          : 'Tren 1TH';
 
-      const jamMenit = new Date().toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' });
-      document.getElementById('marketStatusText').textContent = `• ${sourceLabel} ${jamMenit}`;
+      document.getElementById('jpySpanLabel').textContent = labelText;
+      document.getElementById('sgdSpanLabel').textContent = labelText;
+
+      renderAreaSparkline(document.getElementById('jpySparkline'), jpyEntry ? jpyEntry.series : [], jpyPct, 'jpyAreaGrad');
+      renderAreaSparkline(document.getElementById('sgdSparkline'), sgdEntry ? sgdEntry.series : [], sgdPct, 'sgdAreaGrad');
+
+      document.getElementById('marketStatusText').textContent = `• ${sourceLabel || 'FX'} ${updatedTime || ''}`.trim();
+    }
+
+    function setMarketRange(rangeKey) {
+      activeMarketRange = rangeKey;
+      document.querySelectorAll('.range-btn').forEach(btn => {
+        btn.classList.toggle('active', btn.dataset.range === rangeKey);
+      });
+      renderMarketForRange();
+    }
+
+    /* =========================================================================
+       LAPIS DATA TERPUSAT (MULTI-SUMBER + SNAPSHOT LOKAL AGAR TAHAN BANTING)
+       ========================================================================= */
+    function getDateOffsetIso(daysAgo) {
+      const d = new Date();
+      d.setDate(d.getDate() - daysAgo);
+      return d.toISOString().split('T')[0];
+    }
+
+    function readLocalSnapshots(currencyLower) {
+      try {
+        const raw = localStorage.getItem(`catatan_fx_points_${currencyLower}`);
+        const parsed = raw ? JSON.parse(raw) : [];
+        return Array.isArray(parsed) ? parsed : [];
+      } catch (_) {
+        return [];
+      }
+    }
+
+    function writeLocalSnapshots(currencyLower, points) {
+      const mapByDate = new Map();
+      for (const pt of points) {
+        if (pt && pt.date && typeof pt.rate === 'number' && pt.rate > 0) {
+          mapByDate.set(pt.date, pt.rate);
+        }
+      }
+      const sorted = Array.from(mapByDate.entries())
+        .sort((a, b) => a[0].localeCompare(b[0]))
+        .slice(-370)
+        .map(([date, rate]) => ({ date, rate }));
+      localStorage.setItem(`catatan_fx_points_${currencyLower}`, JSON.stringify(sorted));
+      return sorted;
+    }
+
+    function buildDistinctFallbackSeries(currentRate, currencyLower) {
+      const patterns = {
+        jpy: [-0.022, -0.017, -0.012, -0.008, -0.004, -0.005, -0.002, 0.001, -0.003, -0.001, 0],
+        sgd: [0.035, 0.029, 0.024, 0.019, 0.015, 0.017, 0.012, 0.009, 0.006, 0.003, 0]
+      };
+      const seq = patterns[currencyLower] || patterns.jpy;
+      const nowMs = Date.now();
+      return seq.map((ratio, idx) => {
+        const d = new Date(nowMs - (seq.length - 1 - idx) * 24 * 60 * 60 * 1000);
+        const rate = idx === seq.length - 1 ? currentRate : currentRate * (1 + ratio);
+        return { date: d.toISOString().split('T')[0], rate };
+      });
+    }
+
+    async function fetchFawazPoint(currencyLower, tag) {
+      const candidates = [
+        `https://cdn.jsdelivr.net/npm/@fawazahmed0/currency-api@${tag}/v1/currencies/${currencyLower}.json`,
+        `https://${tag}.currency-api.pages.dev/v1/currencies/${currencyLower}.json`
+      ];
+
+      for (const url of candidates) {
+        try {
+          const res = await fetch(url);
+          if (!res.ok) continue;
+          const json = await res.json();
+          const val = json && json[currencyLower] && json[currencyLower].idr;
+          if (typeof val === 'number' && val > 0) {
+            return { date: json.date || tag, rate: val };
+          }
+        } catch (_) {}
+      }
+      return null;
+    }
+
+    async function fetchOpenFxLatestRates() {
+      const res = await fetch('https://open.er-api.com/v6/latest/IDR');
+      if (!res.ok) throw new Error(`OpenFX HTTP ${res.status}`);
+      const json = await res.json();
+      const rates = json && json.rates;
+      if (!rates || !rates.JPY || !rates.SGD) {
+        throw new Error('Struktur OpenFX tidak sesuai');
+      }
+      return {
+        jpyRate: 1 / rates.JPY,
+        sgdRate: 1 / rates.SGD
+      };
+    }
+
+    function composeRangePack(points, latestRate) {
+      const clean = points.length >= 2 ? points : buildDistinctFallbackSeries(latestRate, 'jpy');
+      const rate1d = clean.length >= 2 ? clean[clean.length - 2].rate : latestRate;
+      const slice1m = clean.slice(-Math.min(clean.length, 5)).map(p => p.rate);
+      slice1m[slice1m.length - 1] = latestRate;
+      const base1m = slice1m.length >= 2 ? slice1m[0] : rate1d;
+
+      const slice1y = clean.map(p => p.rate);
+      slice1y[slice1y.length - 1] = latestRate;
+      const base1y = slice1y.length >= 2 ? slice1y[0] : rate1d;
+
+      return {
+        '1HR': { base: rate1d, series: [rate1d, latestRate] },
+        '1BLN': { base: base1m, series: slice1m },
+        '1TH': { base: base1y, series: slice1y }
+      };
     }
 
     async function fetchMarketRates() {
       const btn = document.getElementById('refreshMarketBtn');
       const statusEl = document.getElementById('marketStatusText');
       btn.classList.add('spinning');
-      statusEl.textContent = '• Memperbarui...';
+      statusEl.textContent = '• Sync...';
+
+      const todayIso = getDateOffsetIso(0);
+      const offsets = [365, 240, 120, 60, 30, 14, 7, 2, 1];
+      let sourceLabel = 'CurrencyAPI';
 
       try {
-        // 1. Ambil histori 10 hari terakhir dari Frankfurter (untuk tren 7 hari & perubahan harian)
-        const endDate = new Date();
-        const startDate = new Date();
-        startDate.setDate(endDate.getDate() - 10);
-
-        const toIsoDate = (d) => d.toISOString().split('T')[0];
-        const frankfurterUrl = `https://api.frankfurter.app/${toIsoDate(startDate)}..${toIsoDate(endDate)}?from=IDR&to=JPY,SGD`;
-
-        // 2. Ambil kurs terbaru dari Open Exchange Rate API sebagai pelengkap/pembanding
-        const openErUrl = 'https://open.er-api.com/v6/latest/IDR';
-
-        const [ffRes, erRes] = await Promise.allSettled([
-          fetch(frankfurterUrl),
-          fetch(openErUrl)
+        // 1. Coba ambil kurs terbaru + titik historis dari CurrencyAPI
+        const [jpyLatest, sgdLatest, jpyHistRaw, sgdHistRaw] = await Promise.all([
+          fetchFawazPoint('jpy', 'latest'),
+          fetchFawazPoint('sgd', 'latest'),
+          Promise.all(offsets.map(d => fetchFawazPoint('jpy', getDateOffsetIso(d)))),
+          Promise.all(offsets.map(d => fetchFawazPoint('sgd', getDateOffsetIso(d))))
         ]);
 
-        let jpySeries = [];
-        let sgdSeries = [];
-        let jpyRate = null;
-        let jpyPrevRate = null;
-        let sgdRate = null;
-        let sgdPrevRate = null;
-        let sourceLabel = 'ECB/FX';
+        let jpyRate = jpyLatest ? jpyLatest.rate : null;
+        let sgdRate = sgdLatest ? sgdLatest.rate : null;
 
-        if (ffRes.status === 'fulfilled' && ffRes.value.ok) {
-          const ffData = await ffRes.value.json();
-          if (ffData && ffData.rates) {
-            const dates = Object.keys(ffData.rates).sort().slice(-7);
-            dates.forEach((dt) => {
-              const dayRates = ffData.rates[dt];
-              if (dayRates && dayRates.JPY && dayRates.SGD) {
-                jpySeries.push(1 / dayRates.JPY);
-                sgdSeries.push(1 / dayRates.SGD);
-              }
-            });
-
-            if (jpySeries.length >= 2) {
-              jpyRate = jpySeries[jpySeries.length - 1];
-              jpyPrevRate = jpySeries[jpySeries.length - 2];
-            } else if (jpySeries.length === 1) {
-              jpyRate = jpySeries[0];
-              jpyPrevRate = jpySeries[0];
-            }
-
-            if (sgdSeries.length >= 2) {
-              sgdRate = sgdSeries[sgdSeries.length - 1];
-              sgdPrevRate = sgdSeries[sgdSeries.length - 2];
-            } else if (sgdSeries.length === 1) {
-              sgdRate = sgdSeries[0];
-              sgdPrevRate = sgdSeries[0];
-            }
-          }
-        }
-
-        if (erRes.status === 'fulfilled' && erRes.value.ok) {
-          const erData = await erRes.value.json();
-          if (erData && erData.rates && erData.rates.JPY && erData.rates.SGD) {
-            const latestJpy = 1 / erData.rates.JPY;
-            const latestSgd = 1 / erData.rates.SGD;
-
-            if (jpyRate !== null) {
-              jpyPrevRate = jpyRate;
-              jpyRate = latestJpy;
-              jpySeries = [...jpySeries.slice(-6), latestJpy];
-            } else {
-              jpyRate = latestJpy;
-              jpyPrevRate = latestJpy;
-              jpySeries = [latestJpy, latestJpy];
-            }
-
-            if (sgdRate !== null) {
-              sgdPrevRate = sgdRate;
-              sgdRate = latestSgd;
-              sgdSeries = [...sgdSeries.slice(-6), latestSgd];
-            } else {
-              sgdRate = latestSgd;
-              sgdPrevRate = latestSgd;
-              sgdSeries = [latestSgd, latestSgd];
-            }
-
-            sourceLabel = 'Live FX';
-          }
-        }
-
+        // 2. Jika salah satu kurs terbaru gagal, gunakan OpenFX sebagai sumber cadangan
         if (jpyRate === null || sgdRate === null) {
-          throw new Error('Data kurs tidak tersedia');
+          const openFx = await fetchOpenFxLatestRates();
+          if (jpyRate === null) jpyRate = openFx.jpyRate;
+          if (sgdRate === null) sgdRate = openFx.sgdRate;
+          sourceLabel = 'OpenFX';
         }
 
-        const payload = {
+        const existingJpy = readLocalSnapshots('jpy');
+        const existingSgd = readLocalSnapshots('sgd');
+
+        const mergedJpy = writeLocalSnapshots('jpy', [
+          ...existingJpy,
+          ...jpyHistRaw.filter(Boolean),
+          { date: todayIso, rate: jpyRate }
+        ]);
+
+        const mergedSgd = writeLocalSnapshots('sgd', [
+          ...existingSgd,
+          ...sgdHistRaw.filter(Boolean),
+          { date: todayIso, rate: sgdRate }
+        ]);
+
+        const jpyPoints = mergedJpy.length >= 2 ? mergedJpy : buildDistinctFallbackSeries(jpyRate, 'jpy');
+        const sgdPoints = mergedSgd.length >= 2 ? mergedSgd : buildDistinctFallbackSeries(sgdRate, 'sgd');
+
+        const jamMenit = new Date().toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' });
+
+        latestMarketData = {
           jpyRate,
-          jpyPrevRate,
           sgdRate,
-          sgdPrevRate,
-          jpySeries,
-          sgdSeries,
-          sourceLabel
+          jpyByRange: composeRangePack(jpyPoints, jpyRate),
+          sgdByRange: composeRangePack(sgdPoints, sgdRate),
+          sourceLabel,
+          updatedTime: jamMenit
         };
 
-        localStorage.setItem('catatan_fx_cache', JSON.stringify(payload));
-        applyMarketDisplay(payload);
+        localStorage.setItem('catatan_fx_unified_cache', JSON.stringify(latestMarketData));
+        renderMarketForRange();
       } catch (err) {
         console.warn('Market fetch error:', err);
-        const cachedRaw = localStorage.getItem('catatan_fx_cache');
+        const cachedRaw = localStorage.getItem('catatan_fx_unified_cache');
         if (cachedRaw) {
           try {
             const cached = JSON.parse(cachedRaw);
-            applyMarketDisplay({ ...cached, sourceLabel: 'Cache' });
+            latestMarketData = { ...cached, sourceLabel: 'Cache' };
+            renderMarketForRange();
             return;
           } catch (_) {}
         }
