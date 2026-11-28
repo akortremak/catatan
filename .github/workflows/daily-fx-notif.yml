@@ -1,0 +1,138 @@
+name: Daily FX Notification (JPY & SGD)
+
+on:
+  schedule:
+    # Berjalan setiap hari pukul 00:30 UTC (07:30 WIB)
+    - cron: '30 0 * * *'
+  workflow_dispatch:
+    # Memungkinkan tes manual kapan saja lewat tab Actions -> Run workflow
+
+jobs:
+  send-fx-report:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Fetch JPY & SGD Rates and Send to Telegram
+        env:
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+        run: |
+          node -e '
+          (async () => {
+            const token = process.env.TELEGRAM_BOT_TOKEN;
+            const chatId = process.env.TELEGRAM_CHAT_ID;
+
+            if (!token || !chatId) {
+              throw new Error("TELEGRAM_BOT_TOKEN atau TELEGRAM_CHAT_ID belum diisi di GitHub Secrets.");
+            }
+
+            const endDate = new Date();
+            const startDate = new Date();
+            startDate.setDate(endDate.getDate() - 10);
+            const toIso = (d) => d.toISOString().split("T")[0];
+
+            const ffUrl = `https://api.frankfurter.app/${toIso(startDate)}..${toIso(endDate)}?from=IDR&to=JPY,SGD`;
+            const erUrl = "https://open.er-api.com/v6/latest/IDR";
+
+            const [ffRes, erRes] = await Promise.allSettled([fetch(ffUrl), fetch(erUrl)]);
+
+            let jpyRate = null, jpyPrev = null;
+            let sgdRate = null, sgdPrev = null;
+
+            if (ffRes.status === "fulfilled" && ffRes.value.ok) {
+              const ffData = await ffRes.value.json();
+              if (ffData && ffData.rates) {
+                const dates = Object.keys(ffData.rates).sort().slice(-7);
+                const jpySeries = [];
+                const sgdSeries = [];
+                for (const dt of dates) {
+                  const r = ffData.rates[dt];
+                  if (r && r.JPY && r.SGD) {
+                    jpySeries.push(1 / r.JPY);
+                    sgdSeries.push(1 / r.SGD);
+                  }
+                }
+                if (jpySeries.length >= 2) {
+                  jpyRate = jpySeries[jpySeries.length - 1];
+                  jpyPrev = jpySeries[jpySeries.length - 2];
+                } else if (jpySeries.length === 1) {
+                  jpyRate = jpyPrev = jpySeries[0];
+                }
+                if (sgdSeries.length >= 2) {
+                  sgdRate = sgdSeries[sgdSeries.length - 1];
+                  sgdPrev = sgdSeries[sgdSeries.length - 2];
+                } else if (sgdSeries.length === 1) {
+                  sgdRate = sgdPrev = sgdSeries[0];
+                }
+              }
+            }
+
+            if (erRes.status === "fulfilled" && erRes.value.ok) {
+              const erData = await erRes.value.json();
+              if (erData && erData.rates && erData.rates.JPY && erData.rates.SGD) {
+                const latestJpy = 1 / erData.rates.JPY;
+                const latestSgd = 1 / erData.rates.SGD;
+                jpyPrev = jpyRate !== null ? jpyRate : latestJpy;
+                jpyRate = latestJpy;
+                sgdPrev = sgdRate !== null ? sgdRate : latestSgd;
+                sgdRate = latestSgd;
+              }
+            }
+
+            if (jpyRate === null || sgdRate === null) {
+              throw new Error("Gagal mengambil data kurs dari API.");
+            }
+
+            const formatRp = (val) => {
+              const dec = val < 500 ? 2 : 0;
+              return "Rp " + val.toLocaleString("id-ID", {
+                minimumFractionDigits: dec,
+                maximumFractionDigits: dec
+              });
+            };
+
+            const formatChange = (curr, prev) => {
+              if (!prev || prev <= 0) return "• 0,00%";
+              const pct = ((curr - prev) / prev) * 100;
+              const abs = Math.abs(pct).toFixed(2).replace(".", ",");
+              if (pct > 0.005) return `▲ +${abs}%`;
+              if (pct < -0.005) return `▼ -${abs}%`;
+              return "• 0,00%";
+            };
+
+            const waktuWib = new Date().toLocaleString("id-ID", {
+              timeZone: "Asia/Jakarta",
+              day: "2-digit",
+              month: "short",
+              year: "numeric",
+              hour: "2-digit",
+              minute: "2-digit"
+            });
+
+            const message = [
+              "📊 *Update Pasar Uang — Catatan*",
+              `🕒 ${waktuWib} WIB`,
+              "",
+              `🇯🇵 *1 JPY* = *${formatRp(jpyRate)}* (${formatChange(jpyRate, jpyPrev)})`,
+              `🇸🇬 *1 SGD* = *${formatRp(sgdRate)}* (${formatChange(sgdRate, sgdPrev)})`,
+              "",
+              "🔗 [Buka Aplikasi Catatan](https://akortremak.github.io/catatan/)"
+            ].join("\n");
+
+            const tgRes = await fetch(`https://api.telegram.org/bot${token}/sendMessage`, {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({
+                chat_id: chatId,
+                text: message,
+                parse_mode: "Markdown",
+                disable_web_page_preview: true
+              })
+            });
+
+            const tgJson = await tgRes.json();
+            if (!tgJson.ok) {
+              throw new Error("Telegram API error: " + JSON.stringify(tgJson));
+            }
+            console.log("Notifikasi Telegram berhasil terkirim!");
+          })();
+          '
