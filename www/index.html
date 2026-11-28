@@ -1301,10 +1301,28 @@
       };
     }
 
+    function findNearestDistinctBaseRate(cleanPoints, latestRate) {
+      for (let i = cleanPoints.length - 1; i >= 0; i--) {
+        const candidate = cleanPoints[i].rate;
+        if (typeof candidate === 'number' && candidate > 0 && Math.abs(latestRate - candidate) > 0.0001) {
+          return candidate;
+        }
+      }
+      return latestRate;
+    }
+
     function composeRangePack(points, latestRate) {
       const clean = points.length >= 2 ? points : buildDistinctFallbackSeries(latestRate, 'jpy');
-      const rate1d = clean.length >= 2 ? clean[clean.length - 2].rate : latestRate;
-      const slice1m = clean.slice(-Math.min(clean.length, 5)).map(p => p.rate);
+      const rate1d = findNearestDistinctBaseRate(clean, latestRate);
+
+      // Filter titik berdasarkan rentang waktu nyata ~31 hari agar 1BLN tidak bergeser
+      const cutoff1mMs = Date.now() - 32 * 24 * 60 * 60 * 1000;
+      const filtered1m = clean.filter(pt => {
+        const t = new Date(pt.date + 'T00:00:00').getTime();
+        return !Number.isNaN(t) && t >= cutoff1mMs;
+      });
+      const source1m = filtered1m.length >= 2 ? filtered1m : clean;
+      const slice1m = source1m.map(p => p.rate);
       slice1m[slice1m.length - 1] = latestRate;
       const base1m = slice1m.length >= 2 ? slice1m[0] : rate1d;
 
@@ -1326,7 +1344,7 @@
       statusEl.textContent = '• Sync...';
 
       const todayIso = getDateOffsetIso(0);
-      const offsets = [365, 240, 120, 60, 30, 14, 7, 2, 1];
+      const offsets = [365, 240, 120, 60, 30, 14, 7, 5, 4, 3, 2, 1];
       let sourceLabel = 'CurrencyAPI';
 
       try {
