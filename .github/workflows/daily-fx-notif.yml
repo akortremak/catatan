@@ -3,7 +3,7 @@ name: Daily FX Notification (JPY & SGD)
 on:
   schedule:
     # Berjalan setiap hari pukul 00:30 UTC (07:30 WIB)
-    - cron: '30 0 * * *'
+    - cron: '15 3 * * *'
   workflow_dispatch:
     # Memungkinkan tes manual kapan saja lewat tab Actions -> Run workflow
 
