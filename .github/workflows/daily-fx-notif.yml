@@ -1,138 +1,145 @@
-name: Daily FX Notification (JPY & SGD)
+name: Daily FX Notification
 
 on:
   schedule:
-    # Berjalan setiap hari pukul 00:30 UTC (07:30 WIB)
-    - cron: '15 3 * * *'
+  # Berjalan setiap hari pukul 00:30 UTC (07:30 WIB)
+    - cron: '30 0 * * *'
   workflow_dispatch:
-    # Memungkinkan tes manual kapan saja lewat tab Actions -> Run workflow
 
 jobs:
-  send-fx-report:
+  notify-fx:
     runs-on: ubuntu-latest
     steps:
-      - name: Fetch JPY & SGD Rates and Send to Telegram
+      - name: Send JPY & SGD Update to Telegram
         env:
           TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
           TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
         run: |
           node -e '
-          (async () => {
             const token = process.env.TELEGRAM_BOT_TOKEN;
             const chatId = process.env.TELEGRAM_CHAT_ID;
-
             if (!token || !chatId) {
-              throw new Error("TELEGRAM_BOT_TOKEN atau TELEGRAM_CHAT_ID belum diisi di GitHub Secrets.");
+              console.error("Missing TELEGRAM_BOT_TOKEN or TELEGRAM_CHAT_ID");
+              process.exit(1);
             }
 
-            const endDate = new Date();
-            const startDate = new Date();
-            startDate.setDate(endDate.getDate() - 10);
-            const toIso = (d) => d.toISOString().split("T")[0];
+            function isoDaysAgo(days) {
+              const d = new Date();
+              d.setUTCDate(d.getUTCDate() - days);
+              return d.toISOString().split("T")[0];
+            }
 
-            const ffUrl = `https://api.frankfurter.app/${toIso(startDate)}..${toIso(endDate)}?from=IDR&to=JPY,SGD`;
-            const erUrl = "https://open.er-api.com/v6/latest/IDR";
-
-            const [ffRes, erRes] = await Promise.allSettled([fetch(ffUrl), fetch(erUrl)]);
-
-            let jpyRate = null, jpyPrev = null;
-            let sgdRate = null, sgdPrev = null;
-
-            if (ffRes.status === "fulfilled" && ffRes.value.ok) {
-              const ffData = await ffRes.value.json();
-              if (ffData && ffData.rates) {
-                const dates = Object.keys(ffData.rates).sort().slice(-7);
-                const jpySeries = [];
-                const sgdSeries = [];
-                for (const dt of dates) {
-                  const r = ffData.rates[dt];
-                  if (r && r.JPY && r.SGD) {
-                    jpySeries.push(1 / r.JPY);
-                    sgdSeries.push(1 / r.SGD);
-                  }
-                }
-                if (jpySeries.length >= 2) {
-                  jpyRate = jpySeries[jpySeries.length - 1];
-                  jpyPrev = jpySeries[jpySeries.length - 2];
-                } else if (jpySeries.length === 1) {
-                  jpyRate = jpyPrev = jpySeries[0];
-                }
-                if (sgdSeries.length >= 2) {
-                  sgdRate = sgdSeries[sgdSeries.length - 1];
-                  sgdPrev = sgdSeries[sgdSeries.length - 2];
-                } else if (sgdSeries.length === 1) {
-                  sgdRate = sgdPrev = sgdSeries[0];
-                }
+            async function fetchJsonWithTimeout(url, timeoutMs = 8000) {
+              const controller = new AbortController();
+              const timer = setTimeout(() => controller.abort(), timeoutMs);
+              try {
+                const res = await fetch(url, { signal: controller.signal });
+                if (!res.ok) throw new Error(`HTTP ${res.status}`);
+                return await res.json();
+              } finally {
+                clearTimeout(timer);
               }
             }
 
-            if (erRes.status === "fulfilled" && erRes.value.ok) {
-              const erData = await erRes.value.json();
-              if (erData && erData.rates && erData.rates.JPY && erData.rates.SGD) {
-                const latestJpy = 1 / erData.rates.JPY;
-                const latestSgd = 1 / erData.rates.SGD;
-                jpyPrev = jpyRate !== null ? jpyRate : latestJpy;
-                jpyRate = latestJpy;
-                sgdPrev = sgdRate !== null ? sgdRate : latestSgd;
-                sgdRate = latestSgd;
+            async function fetchFawazIdr(currencyLower, tag) {
+              const urls = [
+                `https://cdn.jsdelivr.net/npm/@fawazahmed0/currency-api@${tag}/v1/currencies/${currencyLower}.json`,
+                `https://${tag}.currency-api.pages.dev/v1/currencies/${currencyLower}.json`
+              ];
+              for (const url of urls) {
+                try {
+                  const data = await fetchJsonWithTimeout(url);
+                  const val = data?.[currencyLower]?.idr;
+                  if (typeof val === "number" && val > 0) return val;
+                } catch (_) {}
               }
+              return null;
             }
 
-            if (jpyRate === null || sgdRate === null) {
-              throw new Error("Gagal mengambil data kurs dari API.");
+            async function fetchOpenFxLatest() {
+              const data = await fetchJsonWithTimeout("https://open.er-api.com/v6/latest/IDR");
+              const rates = data?.rates;
+              if (!rates?.JPY || !rates?.SGD) throw new Error("Invalid OpenFX rates");
+              return {
+                jpy: 1 / rates.JPY,
+                sgd: 1 / rates.SGD
+              };
             }
 
-            const formatRp = (val) => {
-              const dec = val < 500 ? 2 : 0;
+            function formatRp(val) {
+              if (typeof val !== "number" || Number.isNaN(val)) return "Rp —";
+              const decimals = val < 500 ? 2 : 0;
               return "Rp " + val.toLocaleString("id-ID", {
-                minimumFractionDigits: dec,
-                maximumFractionDigits: dec
+                minimumFractionDigits: decimals,
+                maximumFractionDigits: decimals
               });
-            };
-
-            const formatChange = (curr, prev) => {
-              if (!prev || prev <= 0) return "• 0,00%";
-              const pct = ((curr - prev) / prev) * 100;
-              const abs = Math.abs(pct).toFixed(2).replace(".", ",");
-              if (pct > 0.005) return `▲ +${abs}%`;
-              if (pct < -0.005) return `▼ -${abs}%`;
-              return "• 0,00%";
-            };
-
-            const waktuWib = new Date().toLocaleString("id-ID", {
-              timeZone: "Asia/Jakarta",
-              day: "2-digit",
-              month: "short",
-              year: "numeric",
-              hour: "2-digit",
-              minute: "2-digit"
-            });
-
-            const message = [
-              "📊 *Update Pasar Uang — Catatan*",
-              `🕒 ${waktuWib} WIB`,
-              "",
-              `🇯🇵 *1 JPY* = *${formatRp(jpyRate)}* (${formatChange(jpyRate, jpyPrev)})`,
-              `🇸🇬 *1 SGD* = *${formatRp(sgdRate)}* (${formatChange(sgdRate, sgdPrev)})`,
-              "",
-              "🔗 [Buka Aplikasi Catatan](https://akortremak.github.io/catatan/)"
-            ].join("\n");
-
-            const tgRes = await fetch(`https://api.telegram.org/bot${token}/sendMessage`, {
-              method: "POST",
-              headers: { "Content-Type": "application/json" },
-              body: JSON.stringify({
-                chat_id: chatId,
-                text: message,
-                parse_mode: "Markdown",
-                disable_web_page_preview: true
-              })
-            });
-
-            const tgJson = await tgRes.json();
-            if (!tgJson.ok) {
-              throw new Error("Telegram API error: " + JSON.stringify(tgJson));
             }
-            console.log("Notifikasi Telegram berhasil terkirim!");
-          })();
+
+            function formatChange(current, base) {
+              if (!base || base <= 0) return "• 0,00%";
+              const pct = ((current - base) / base) * 100;
+              const str = Math.abs(pct).toFixed(2).replace(".", ",");
+              if (pct > 0.005) return `▲ +${str}%`;
+              if (pct < -0.005) return `▼ -${str}%`;
+              return "• 0,00%";
+            }
+
+            (async () => {
+              let [jpyNow, sgdNow, jpyPrev1d, sgdPrev1d, jpyBase1y, sgdBase1y] = await Promise.all([
+                fetchFawazIdr("jpy", "latest"),
+                fetchFawazIdr("sgd", "latest"),
+                fetchFawazIdr("jpy", isoDaysAgo(1)),
+                fetchFawazIdr("sgd", isoDaysAgo(1)),
+                fetchFawazIdr("jpy", isoDaysAgo(365)),
+                fetchFawazIdr("sgd", isoDaysAgo(365))
+              ]);
+
+              if (jpyNow === null || sgdNow === null) {
+                const fallback = await fetchOpenFxLatest();
+                if (jpyNow === null) jpyNow = fallback.jpy;
+                if (sgdNow === null) sgdNow = fallback.sgd;
+              }
+
+              const safeJpyPrev = jpyPrev1d || jpyNow;
+              const safeSgdPrev = sgdPrev1d || sgdNow;
+              const safeJpy1y = jpyBase1y || safeJpyPrev;
+              const safeSgd1y = sgdBase1y || safeSgdPrev;
+
+              const nowWib = new Date().toLocaleString("id-ID", {
+                timeZone: "Asia/Jakarta",
+                day: "2-digit",
+                month: "short",
+                year: "numeric",
+                hour: "2-digit",
+                minute: "2-digit"
+              });
+
+              const text = [
+                "📊 *Update Pasar Uang — Catatan*",
+                `🕒 ${nowWib} WIB`,
+                "",
+                `🇯🇵 1 JPY = ${formatRp(jpyNow)} (${formatChange(jpyNow, safeJpyPrev)} 1HR | ${formatChange(jpyNow, safeJpy1y)} 1TH)`,
+                `🇸🇬 1 SGD = ${formatRp(sgdNow)} (${formatChange(sgdNow, safeSgdPrev)} 1HR | ${formatChange(sgdNow, safeSgd1y)} 1TH)`,
+                "",
+                "🔗 [Buka Aplikasi Catatan](https://akortremak.github.io/catatan/)"
+              ].join("\n");
+
+              const tgRes = await fetch(`https://api.telegram.org/bot${token}/sendMessage`, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                  chat_id: chatId,
+                  text,
+                  parse_mode: "Markdown",
+                  disable_web_page_preview: true
+                })
+              });
+
+              if (!tgRes.ok) {
+                const errBody = await tgRes.text();
+                console.error("Telegram error:", errBody);
+                process.exit(1);
+              }
+              console.log("Telegram FX notification sent successfully.");
+            })();
           '
