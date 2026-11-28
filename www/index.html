@@ -47,14 +47,14 @@
       width: 100%;
       max-width: 410px;
       height: calc(100vh - 24px);
-      max-height: 780px;
+      max-height: 820px;
       min-height: 640px;
       background: rgba(15, 23, 42, 0.65);
       backdrop-filter: blur(24px);
       -webkit-backdrop-filter: blur(24px);
       border: 1px solid var(--glass-border);
       border-radius: 32px;
-      padding: 24px 20px 24px 20px;
+      padding: 22px 18px 22px 18px;
       box-shadow: 0 30px 60px rgba(0, 0, 0, 0.7), inset 0 1px 1px rgba(255, 255, 255, 0.15);
       position: relative;
       display: flex;
@@ -66,7 +66,7 @@
       display: flex;
       align-items: center;
       justify-content: space-between;
-      margin-bottom: 20px;
+      margin-bottom: 16px;
       flex-shrink: 0;
     }
 
@@ -77,24 +77,24 @@
     }
 
     .avatar-icon {
-      width: 42px;
-      height: 42px;
+      width: 40px;
+      height: 40px;
       border-radius: 14px;
       background: linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%);
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 1.2rem;
+      font-size: 1.15rem;
       box-shadow: 0 4px 14px rgba(59, 130, 246, 0.4);
     }
 
     .header-text .greeting {
-      font-size: 0.75rem;
+      font-size: 0.72rem;
       color: var(--text-muted);
     }
 
     .header-text .title-app {
-      font-size: 1rem;
+      font-size: 0.98rem;
       font-weight: 700;
       color: #fff;
     }
@@ -105,7 +105,7 @@
       color: var(--accent-income);
       padding: 4px 10px;
       border-radius: 20px;
-      font-size: 0.7rem;
+      font-size: 0.68rem;
       font-weight: 600;
       display: flex;
       align-items: center;
@@ -125,9 +125,9 @@
     .balance-card {
       background: linear-gradient(135deg, rgba(59, 130, 246, 0.15) 0%, rgba(139, 92, 246, 0.15) 100%);
       border: 1px solid rgba(255, 255, 255, 0.15);
-      border-radius: 24px;
-      padding: 22px;
-      margin-bottom: 16px;
+      border-radius: 22px;
+      padding: 18px 20px;
+      margin-bottom: 12px;
       box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.2);
       flex-shrink: 0;
     }
@@ -136,29 +136,29 @@
       display: flex;
       justify-content: space-between;
       align-items: center;
-      margin-bottom: 6px;
+      margin-bottom: 4px;
     }
 
     .balance-title {
-      font-size: 0.8rem;
+      font-size: 0.78rem;
       color: var(--text-muted);
     }
 
     .balance-amount {
-      font-size: 2.1rem;
+      font-size: 1.95rem;
       font-weight: 700;
       color: #fff;
-      margin-bottom: 16px;
+      margin-bottom: 12px;
       text-shadow: 0 0 15px rgba(255, 255, 255, 0.2);
     }
 
     .balance-footer {
       border-top: 1px solid rgba(255, 255, 255, 0.1);
-      padding-top: 12px;
+      padding-top: 10px;
       display: flex;
       justify-content: space-between;
       align-items: center;
-      font-size: 0.75rem;
+      font-size: 0.72rem;
       color: var(--text-muted);
     }
 
@@ -183,16 +183,16 @@
     .summary-grid {
       display: grid;
       grid-template-columns: 1fr 1fr;
-      gap: 12px;
-      margin-bottom: 20px;
+      gap: 10px;
+      margin-bottom: 12px;
       flex-shrink: 0;
     }
 
     .summary-card {
       background: var(--glass-card);
       border: 1px solid var(--glass-border);
-      border-radius: 20px;
-      padding: 14px;
+      border-radius: 18px;
+      padding: 12px 13px;
       display: flex;
       flex-direction: column;
       justify-content: space-between;
@@ -202,89 +202,243 @@
       display: flex;
       align-items: center;
       justify-content: space-between;
-      margin-bottom: 8px;
+      margin-bottom: 6px;
     }
 
     .summary-label {
-      font-size: 0.85rem;
+      font-size: 0.8rem;
       color: var(--text-muted);
       font-weight: 500;
     }
 
     .summary-icon-arrow {
-      width: 28px;
-      height: 28px;
+      width: 24px;
+      height: 24px;
       border-radius: 50%;
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 0.8rem;
+      font-size: 0.75rem;
     }
 
     .summary-card.income .summary-icon-arrow { background: rgba(16, 185, 129, 0.15); color: var(--accent-income); }
     .summary-card.expense .summary-icon-arrow { background: rgba(244, 63, 94, 0.15); color: var(--accent-expense); }
 
     .summary-value {
-      font-size: 1.1rem;
+      font-size: 1rem;
       font-weight: 700;
-      margin-bottom: 6px;
+      margin-bottom: 4px;
     }
 
     .income .summary-value { color: var(--accent-income); }
     .expense .summary-value { color: var(--accent-expense); }
 
     .summary-subtext {
-      font-size: 0.72rem;
+      font-size: 0.68rem;
       font-weight: 600;
       transition: color 0.3s ease;
     }
 
-    /* History Section & Unified Scrollable Card */
-    .section-header {
+    /* Scrollable Main Area (Pasar Uang + Riwayat Transaksi) */
+    .content-scroll {
+      flex: 1;
+      min-height: 0;
+      overflow-y: auto;
+      padding-bottom: 78px;
       display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 12px;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .content-scroll::-webkit-scrollbar {
+      width: 4px;
+    }
+    .content-scroll::-webkit-scrollbar-track {
+      background: transparent;
+    }
+    .content-scroll::-webkit-scrollbar-thumb {
+      background: rgba(255, 255, 255, 0.15);
+      border-radius: 10px;
+    }
+
+    /* Market Section (Opsi 2: JPY & SGD + Sparkline 7 Hari + Panah & %) */
+    .market-card {
+      background: var(--glass-card);
+      border: 1px solid var(--glass-border);
+      border-radius: 20px;
+      padding: 13px 14px;
       flex-shrink: 0;
     }
 
-    .section-title {
-      font-size: 0.9rem;
+    .market-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 10px;
+    }
+
+    .market-title-group {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .market-title {
+      font-size: 0.84rem;
       font-weight: 700;
       color: #fff;
     }
 
-    .history-container {
-      flex: 1;
-      min-height: 0;
+    .market-meta {
+      font-size: 0.66rem;
+      color: var(--text-muted);
+    }
+
+    .market-actions {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .refresh-market-btn {
+      background: rgba(255, 255, 255, 0.06);
+      border: 1px solid var(--glass-border);
+      color: var(--text-muted);
+      border-radius: 9px;
+      padding: 4px 8px;
+      font-size: 0.68rem;
+      font-weight: 600;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      transition: all 0.2s ease;
+    }
+
+    .refresh-market-btn:hover {
+      color: #fff;
+      background: rgba(255, 255, 255, 0.12);
+    }
+
+    .refresh-market-btn.spinning svg {
+      animation: spin360 0.8s linear infinite;
+    }
+
+    @keyframes spin360 {
+      from { transform: rotate(0deg); }
+      to { transform: rotate(360deg); }
+    }
+
+    .market-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+    }
+
+    .fx-box {
+      background: rgba(2, 6, 23, 0.45);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 15px;
+      padding: 10px 11px;
       display: flex;
       flex-direction: column;
+      justify-content: space-between;
+      gap: 6px;
+    }
+
+    .fx-top {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 4px;
+    }
+
+    .fx-pair {
+      font-size: 0.74rem;
+      font-weight: 700;
+      color: #e2e8f0;
+      white-space: nowrap;
+    }
+
+    .fx-change {
+      font-size: 0.66rem;
+      font-weight: 700;
+      padding: 2px 6px;
+      border-radius: 8px;
+      white-space: nowrap;
+      display: inline-flex;
+      align-items: center;
+      gap: 2px;
+    }
+
+    .fx-change.up {
+      color: var(--accent-income);
+      background: rgba(16, 185, 129, 0.14);
+    }
+
+    .fx-change.down {
+      color: var(--accent-expense);
+      background: rgba(244, 63, 94, 0.14);
+    }
+
+    .fx-change.flat {
+      color: var(--text-muted);
+      background: rgba(148, 163, 184, 0.14);
+    }
+
+    .fx-rate {
+      font-size: 0.92rem;
+      font-weight: 700;
+      color: #fff;
+      line-height: 1.2;
+    }
+
+    .fx-chart-row {
+      display: flex;
+      align-items: flex-end;
+      justify-content: space-between;
+      gap: 6px;
+      margin-top: 2px;
+    }
+
+    .fx-span-label {
+      font-size: 0.62rem;
+      color: var(--text-muted);
+    }
+
+    .fx-sparkline {
+      width: 68px;
+      height: 24px;
+      flex-shrink: 0;
+      overflow: visible;
+    }
+
+    /* History Section */
+    .section-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 8px;
+      flex-shrink: 0;
+    }
+
+    .section-title {
+      font-size: 0.88rem;
+      font-weight: 700;
+      color: #fff;
     }
 
     .history-card-unified {
       background: var(--glass-card);
       border: 1px solid var(--glass-border);
       border-radius: 20px;
-      overflow-y: auto;
-      max-height: 100%;
-      padding-bottom: 76px;
       display: flex;
       flex-direction: column;
-    }
-
-    .history-card-unified::-webkit-scrollbar {
-      width: 4px;
-    }
-    .history-card-unified::-webkit-scrollbar-track {
-      background: transparent;
-    }
-    .history-card-unified::-webkit-scrollbar-thumb {
-      background: rgba(255, 255, 255, 0.15);
-      border-radius: 10px;
+      flex-shrink: 0;
     }
 
     .history-item {
-      padding: 13px 16px;
+      padding: 12px 14px;
       display: flex;
       align-items: center;
       justify-content: space-between;
@@ -301,27 +455,27 @@
     }
 
     .empty-history {
-      padding: 28px 16px;
+      padding: 24px 16px;
       text-align: center;
-      font-size: 0.82rem;
+      font-size: 0.8rem;
       color: var(--text-muted);
     }
 
     .item-left {
       display: flex;
       align-items: center;
-      gap: 12px;
+      gap: 11px;
       min-width: 0;
     }
 
     .item-icon {
-      width: 36px;
-      height: 36px;
-      border-radius: 12px;
+      width: 34px;
+      height: 34px;
+      border-radius: 11px;
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 1rem;
+      font-size: 0.95rem;
       flex-shrink: 0;
     }
 
@@ -333,7 +487,7 @@
     }
 
     .item-details .category-name {
-      font-size: 0.85rem;
+      font-size: 0.84rem;
       font-weight: 600;
       color: #fff;
       white-space: nowrap;
@@ -342,19 +496,19 @@
     }
 
     .item-details .item-date {
-      font-size: 0.7rem;
+      font-size: 0.68rem;
       color: var(--text-muted);
     }
 
     .item-right {
       display: flex;
       align-items: center;
-      gap: 10px;
+      gap: 8px;
       flex-shrink: 0;
     }
 
     .item-amount {
-      font-size: 0.88rem;
+      font-size: 0.85rem;
       font-weight: 700;
       text-align: right;
     }
@@ -366,14 +520,14 @@
       background: rgba(244, 63, 94, 0.12);
       border: 1px solid rgba(244, 63, 94, 0.2);
       color: var(--accent-expense);
-      width: 30px;
-      height: 30px;
-      border-radius: 10px;
+      width: 28px;
+      height: 28px;
+      border-radius: 9px;
       cursor: pointer;
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 0.85rem;
+      font-size: 0.82rem;
       transition: all 0.2s;
     }
 
@@ -386,17 +540,17 @@
       transform: scale(0.92);
     }
 
-    /* Tombol + Mengambang di Bawah Tengah (Warna Kartu Gelap) */
+    /* Tombol + Mengambang di Bawah Tengah (Warna Kartu Gelap Tanpa Glow) */
     .fab-center-btn {
       position: absolute;
-      bottom: 22px;
+      bottom: 20px;
       left: 50%;
       transform: translateX(-50%);
-      width: 56px;
-      height: 56px;
+      width: 54px;
+      height: 54px;
       padding: 0;
-      border-radius: 20px;
-      background: rgba(15, 23, 42, 0.92);
+      border-radius: 19px;
+      background: rgba(15, 23, 42, 0.94);
       backdrop-filter: blur(12px);
       -webkit-backdrop-filter: blur(12px);
       border: 1px solid var(--glass-border);
@@ -731,14 +885,68 @@
       </div>
     </div>
 
-    <!-- Transaction History List -->
-    <div class="section-header">
-      <div class="section-title">Riwayat Transaksi Terbaru</div>
-    </div>
+    <!-- Scrollable Area: Pasar Uang + Riwayat Transaksi -->
+    <div class="content-scroll">
+      <!-- Pasar Uang (Jepang JPY & Singapura SGD) -->
+      <div class="market-card">
+        <div class="market-header">
+          <div class="market-title-group">
+            <span class="market-title">Pasar Uang</span>
+            <span class="market-meta" id="marketStatusText">Memuat kurs...</span>
+          </div>
+          <div class="market-actions">
+            <button type="button" class="refresh-market-btn" id="refreshMarketBtn" onclick="fetchMarketRates()" title="Perbarui Kurs">
+              <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
+                <polyline points="23 4 23 10 17 10"></polyline>
+                <polyline points="1 20 1 14 7 14"></polyline>
+                <path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"></path>
+              </svg>
+              <span>Sync</span>
+            </button>
+          </div>
+        </div>
 
-    <div class="history-container">
-      <div class="history-card-unified" id="historyList">
-        <div class="empty-history">Belum ada riwayat transaksi</div>
+        <div class="market-grid">
+          <!-- 1 JPY -> IDR -->
+          <div class="fx-box">
+            <div class="fx-top">
+              <span class="fx-pair">🇯🇵 1 JPY</span>
+              <span class="fx-change flat" id="jpyChangeBadge">— 0.00%</span>
+            </div>
+            <div class="fx-rate" id="jpyRateText">Rp —</div>
+            <div class="fx-chart-row">
+              <span class="fx-span-label">Tren 7 hari</span>
+              <svg class="fx-sparkline" id="jpySparkline" viewBox="0 0 68 24">
+                <polyline fill="none" stroke="#94a3b8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" points="2,12 66,12"></polyline>
+              </svg>
+            </div>
+          </div>
+
+          <!-- 1 SGD -> IDR -->
+          <div class="fx-box">
+            <div class="fx-top">
+              <span class="fx-pair">🇸🇬 1 SGD</span>
+              <span class="fx-change flat" id="sgdChangeBadge">— 0.00%</span>
+            </div>
+            <div class="fx-rate" id="sgdRateText">Rp —</div>
+            <div class="fx-chart-row">
+              <span class="fx-span-label">Tren 7 hari</span>
+              <svg class="fx-sparkline" id="sgdSparkline" viewBox="0 0 68 24">
+                <polyline fill="none" stroke="#94a3b8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" points="2,12 66,12"></polyline>
+              </svg>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Transaction History List -->
+      <div>
+        <div class="section-header">
+          <div class="section-title">Riwayat Transaksi Terbaru</div>
+        </div>
+        <div class="history-card-unified" id="historyList">
+          <div class="empty-history">Belum ada riwayat transaksi</div>
+        </div>
       </div>
     </div>
 
@@ -836,6 +1044,214 @@
       }
       this.value = Number(rawDigits).toLocaleString('id-ID');
     });
+
+    function formatIdrRate(value) {
+      if (typeof value !== 'number' || Number.isNaN(value)) return 'Rp —';
+      const decimals = value < 500 ? 2 : 0;
+      return 'Rp ' + value.toLocaleString('id-ID', {
+        minimumFractionDigits: decimals,
+        maximumFractionDigits: decimals
+      });
+    }
+
+    function renderChangeBadge(badgeEl, pctChange) {
+      if (typeof pctChange !== 'number' || Number.isNaN(pctChange)) {
+        badgeEl.className = 'fx-change flat';
+        badgeEl.textContent = '— 0.00%';
+        return;
+      }
+      const absPct = Math.abs(pctChange).toFixed(2);
+      if (pctChange > 0.005) {
+        badgeEl.className = 'fx-change up';
+        badgeEl.textContent = `▲ +${absPct}%`;
+      } else if (pctChange < -0.005) {
+        badgeEl.className = 'fx-change down';
+        badgeEl.textContent = `▼ -${absPct}%`;
+      } else {
+        badgeEl.className = 'fx-change flat';
+        badgeEl.textContent = `• 0.00%`;
+      }
+    }
+
+    function renderSparkline(svgEl, series, pctChange) {
+      if (!Array.isArray(series) || series.length < 2) {
+        svgEl.innerHTML = `<polyline fill="none" stroke="#94a3b8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" points="2,12 66,12"></polyline>`;
+        return;
+      }
+
+      const width = 68;
+      const height = 24;
+      const padX = 2;
+      const padY = 3;
+
+      const minVal = Math.min(...series);
+      const maxVal = Math.max(...series);
+      const range = maxVal - minVal || 1;
+
+      const points = series.map((val, idx) => {
+        const x = padX + (idx / (series.length - 1)) * (width - padX * 2);
+        const normalized = (val - minVal) / range;
+        const y = height - padY - normalized * (height - padY * 2);
+        return `${x.toFixed(1)},${y.toFixed(1)}`;
+      }).join(' ');
+
+      let strokeColor = '#94a3b8';
+      if (pctChange > 0.005) strokeColor = '#10b981';
+      else if (pctChange < -0.005) strokeColor = '#f43f5e';
+
+      svgEl.innerHTML = `
+        <polyline
+          fill="none"
+          stroke="${strokeColor}"
+          stroke-width="2"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          points="${points}"
+        ></polyline>
+      `;
+    }
+
+    function applyMarketDisplay(payload) {
+      const { jpyRate, jpyPrevRate, sgdRate, sgdPrevRate, jpySeries, sgdSeries, sourceLabel } = payload;
+
+      document.getElementById('jpyRateText').textContent = formatIdrRate(jpyRate);
+      document.getElementById('sgdRateText').textContent = formatIdrRate(sgdRate);
+
+      const jpyPct = jpyPrevRate && jpyPrevRate > 0 ? ((jpyRate - jpyPrevRate) / jpyPrevRate) * 100 : 0;
+      const sgdPct = sgdPrevRate && sgdPrevRate > 0 ? ((sgdRate - sgdPrevRate) / sgdPrevRate) * 100 : 0;
+
+      renderChangeBadge(document.getElementById('jpyChangeBadge'), jpyPct);
+      renderChangeBadge(document.getElementById('sgdChangeBadge'), sgdPct);
+
+      renderSparkline(document.getElementById('jpySparkline'), jpySeries, jpyPct);
+      renderSparkline(document.getElementById('sgdSparkline'), sgdSeries, sgdPct);
+
+      const jamMenit = new Date().toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' });
+      document.getElementById('marketStatusText').textContent = `• ${sourceLabel} ${jamMenit}`;
+    }
+
+    async function fetchMarketRates() {
+      const btn = document.getElementById('refreshMarketBtn');
+      const statusEl = document.getElementById('marketStatusText');
+      btn.classList.add('spinning');
+      statusEl.textContent = '• Memperbarui...';
+
+      try {
+        // 1. Ambil histori 10 hari terakhir dari Frankfurter (untuk tren 7 hari & perubahan harian)
+        const endDate = new Date();
+        const startDate = new Date();
+        startDate.setDate(endDate.getDate() - 10);
+
+        const toIsoDate = (d) => d.toISOString().split('T')[0];
+        const frankfurterUrl = `https://api.frankfurter.app/${toIsoDate(startDate)}..${toIsoDate(endDate)}?from=IDR&to=JPY,SGD`;
+
+        // 2. Ambil kurs terbaru dari Open Exchange Rate API sebagai pelengkap/pembanding
+        const openErUrl = 'https://open.er-api.com/v6/latest/IDR';
+
+        const [ffRes, erRes] = await Promise.allSettled([
+          fetch(frankfurterUrl),
+          fetch(openErUrl)
+        ]);
+
+        let jpySeries = [];
+        let sgdSeries = [];
+        let jpyRate = null;
+        let jpyPrevRate = null;
+        let sgdRate = null;
+        let sgdPrevRate = null;
+        let sourceLabel = 'ECB/FX';
+
+        if (ffRes.status === 'fulfilled' && ffRes.value.ok) {
+          const ffData = await ffRes.value.json();
+          if (ffData && ffData.rates) {
+            const dates = Object.keys(ffData.rates).sort().slice(-7);
+            dates.forEach((dt) => {
+              const dayRates = ffData.rates[dt];
+              if (dayRates && dayRates.JPY && dayRates.SGD) {
+                jpySeries.push(1 / dayRates.JPY);
+                sgdSeries.push(1 / dayRates.SGD);
+              }
+            });
+
+            if (jpySeries.length >= 2) {
+              jpyRate = jpySeries[jpySeries.length - 1];
+              jpyPrevRate = jpySeries[jpySeries.length - 2];
+            } else if (jpySeries.length === 1) {
+              jpyRate = jpySeries[0];
+              jpyPrevRate = jpySeries[0];
+            }
+
+            if (sgdSeries.length >= 2) {
+              sgdRate = sgdSeries[sgdSeries.length - 1];
+              sgdPrevRate = sgdSeries[sgdSeries.length - 2];
+            } else if (sgdSeries.length === 1) {
+              sgdRate = sgdSeries[0];
+              sgdPrevRate = sgdSeries[0];
+            }
+          }
+        }
+
+        if (erRes.status === 'fulfilled' && erRes.value.ok) {
+          const erData = await erRes.value.json();
+          if (erData && erData.rates && erData.rates.JPY && erData.rates.SGD) {
+            const latestJpy = 1 / erData.rates.JPY;
+            const latestSgd = 1 / erData.rates.SGD;
+
+            if (jpyRate !== null) {
+              jpyPrevRate = jpyRate;
+              jpyRate = latestJpy;
+              jpySeries = [...jpySeries.slice(-6), latestJpy];
+            } else {
+              jpyRate = latestJpy;
+              jpyPrevRate = latestJpy;
+              jpySeries = [latestJpy, latestJpy];
+            }
+
+            if (sgdRate !== null) {
+              sgdPrevRate = sgdRate;
+              sgdRate = latestSgd;
+              sgdSeries = [...sgdSeries.slice(-6), latestSgd];
+            } else {
+              sgdRate = latestSgd;
+              sgdPrevRate = latestSgd;
+              sgdSeries = [latestSgd, latestSgd];
+            }
+
+            sourceLabel = 'Live FX';
+          }
+        }
+
+        if (jpyRate === null || sgdRate === null) {
+          throw new Error('Data kurs tidak tersedia');
+        }
+
+        const payload = {
+          jpyRate,
+          jpyPrevRate,
+          sgdRate,
+          sgdPrevRate,
+          jpySeries,
+          sgdSeries,
+          sourceLabel
+        };
+
+        localStorage.setItem('catatan_fx_cache', JSON.stringify(payload));
+        applyMarketDisplay(payload);
+      } catch (err) {
+        console.warn('Market fetch error:', err);
+        const cachedRaw = localStorage.getItem('catatan_fx_cache');
+        if (cachedRaw) {
+          try {
+            const cached = JSON.parse(cachedRaw);
+            applyMarketDisplay({ ...cached, sourceLabel: 'Cache' });
+            return;
+          } catch (_) {}
+        }
+        statusEl.textContent = '• Offline';
+      } finally {
+        btn.classList.remove('spinning');
+      }
+    }
 
     function togglePrivacyMode() {
       isBalanceHidden = !isBalanceHidden;
@@ -1135,6 +1551,7 @@
     }
 
     fetchData();
+    fetchMarketRates();
   </script>
 </body>
 </html>
